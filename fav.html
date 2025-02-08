@@ -37,43 +37,72 @@
     ></div>
     <script>
       window.onload = function () {
-        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        const container = document.getElementById("favoritesContainer");
+        const currentUser = localStorage.getItem("currentUser"); // استرجاع currentUser
+        if (!currentUser) {
+          alert("Please log in to view favorites.");
+          return;
+        }
 
-        favorites.forEach((book) => {
-          const card = document.createElement("div");
-          card.className = "col-md-4 card";
-          card.setAttribute("data-id", book.id);
+        let readers_log = JSON.parse(localStorage.getItem("readers_log")) || [];
+        let userIndex = readers_log.findIndex(
+          (user) => user.email === currentUser
+        );
 
-          const img = document.createElement("img");
-          img.src = book.imgSrc;
-          img.alt = "Book Cover";
-          img.className = "d-block w-100";
+        if (
+          userIndex !== -1 &&
+          Array.isArray(readers_log[userIndex].fav_books)
+        ) {
+          const container = document.getElementById("favoritesContainer");
+          readers_log[userIndex].fav_books.forEach((book) => {
+            const card = document.createElement("div");
+            card.className = "col-md-4 card";
+            card.setAttribute("data-id", book.id);
 
-          const info = document.createElement("div");
-          info.innerHTML = book.more + book.love;
-          info.className = "info";
+            const img = document.createElement("img");
+            img.src = book.imgSrc;
+            img.alt = "Book Cover";
+            img.className = "d-block w-100";
 
-          const heartButton = info.querySelector(".heart");
-          if (heartButton) {
-            heartButton.classList.add("liked");
-            heartButton.addEventListener("click", () => {
-              removeFromFavorites(book.id);
-            });
-          }
+            const info = document.createElement("div");
+            info.innerHTML = book.more + book.love;
+            info.className = "info";
 
-          card.appendChild(img);
-          card.appendChild(info);
+            const heartButton = info.querySelector(".heart");
+            if (heartButton) {
+              heartButton.classList.add("liked");
+              heartButton.addEventListener("click", () => {
+                removeFromFavorites(book.id);
+              });
+            }
 
-          container.appendChild(card);
-        });
+            card.appendChild(img);
+            card.appendChild(info);
+
+            container.appendChild(card);
+          });
+        }
       };
 
       function removeFromFavorites(bookId) {
-        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-        favorites = favorites.filter((book) => book.id !== bookId);
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-        window.location.reload();
+        const currentUser = localStorage.getItem("currentUser"); // استرجاع currentUser
+        if (!currentUser) {
+          alert("Please log in to remove favorites.");
+          return;
+        }
+
+        let readers_log = JSON.parse(localStorage.getItem("readers_log")) || [];
+        let userIndex = readers_log.findIndex(
+          (user) => user.email === currentUser
+        );
+
+        if (userIndex !== -1) {
+          let favorites = readers_log[userIndex].fav_books;
+          favorites = favorites.filter((book) => book.id !== bookId);
+          readers_log[userIndex].fav_books = favorites;
+
+          localStorage.setItem("readers_log", JSON.stringify(readers_log));
+          window.location.reload();
+        }
       }
     </script>
 

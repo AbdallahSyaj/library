@@ -5,22 +5,21 @@
   text-align: center;
   width: 200px;
   position: relative;
-  border-radius: 10px; /* زاوية مستديرة */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* ظل */
-  transition: transform 0.2s; /* تأثير التحريك عند المرور */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
 }
 
 .card:hover {
-  transform: scale(1.05); /* تكبير عند المرور */
+  transform: scale(1.05);
 }
 
 .card img {
   width: 100px;
   height: 150px;
-  border-radius: 5px; /* زاوية مستديرة للصورة */
+  border-radius: 5px;
 }
 
-/* تصميم القلب */
 .card .heart {
   position: absolute;
   top: 10px;

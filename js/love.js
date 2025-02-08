@@ -56,36 +56,68 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function toggleFavorite(bookId, heart) {
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  let readers_log = JSON.parse(localStorage.getItem("readers_log")) || [];
+  let currentUser = localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    alert("Please log in to add favorites.");
+    return;
+  }
+
+  let userIndex = readers_log.findIndex((user) => user.email === currentUser);
+
+  if (userIndex === -1) {
+    alert("User not found!");
+    return;
+  }
+
+  if (!Array.isArray(readers_log[userIndex].fav_books)) {
+    readers_log[userIndex].fav_books = [];
+  }
   const bookCard = document.querySelector(`.card[data-id="${bookId}"]`);
   const bookData = {
     id: bookId,
     imgSrc: bookCard.querySelector("img").src,
-    // div: bookCard.querySelector(".info").outerHTML,
     more: bookCard.querySelector("a").outerHTML,
     love: bookCard.querySelector("button").outerHTML,
   };
 
-  const index = favorites.findIndex((book) => book.id === bookId);
+  const bookIndex = readers_log[userIndex].fav_books.findIndex(
+    (book) => book.id === bookId
+  );
 
-  if (index === -1) {
-    favorites.push(bookData);
+  if (bookIndex === -1) {
+    readers_log[userIndex].fav_books.push(bookData);
     heart.classList.add("liked");
   } else {
-    favorites.splice(index, 1);
+    readers_log[userIndex].fav_books.splice(bookIndex, 1);
     heart.classList.remove("liked");
   }
 
-  localStorage.setItem("favorites", JSON.stringify(favorites));
+  // تحديث localStorage
+  localStorage.setItem("readers_log", JSON.stringify(readers_log));
 }
 
 function loadFavorites() {
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  favorites.forEach((favorite) => {
-    const bookCard = document.querySelector(`.card[data-id="${favorite.id}"]`);
-    if (bookCard) {
-      const heart = bookCard.querySelector(".heart");
-      heart.classList.add("liked");
-    }
-  });
+  let readers_log = JSON.parse(localStorage.getItem("readers_log")) || [];
+  let currentUser = localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    alert("Please log in to view favorites.");
+    return;
+  }
+
+  let userIndex = readers_log.findIndex((user) => user.email === currentUser);
+
+  if (userIndex !== -1 && Array.isArray(readers_log[userIndex].fav_books)) {
+    readers_log[userIndex].fav_books.forEach((favorite) => {
+      const bookCard = document.querySelector(
+        `.card[data-id="${favorite.id}"]`
+      );
+      if (bookCard) {
+        const heart = bookCard.querySelector(".heart");
+        heart.classList.add("liked");
+      }
+    });
+  }
 }
